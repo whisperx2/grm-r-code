@@ -1,0 +1,47 @@
+## read data into r
+data<-read.table('Bloodpressure.txt',head=T)
+head(data)
+##Scatter plot of the recovery time agaist the log of the drug quantity used")
+# explore the data
+plot(data$log_drug,data$recovery_time,xlab = "log of the drug quantity used (in mg)",
+     ylab="recovery time (in minuites)")
+plot(data$blood_pressure,data$recovery_time,xlab = "mean level of the blood pressure (in
+mm Hg)", ylab="recovery time (in minuites)")
+
+cor(data$log_drug,data$recovery_time)
+cor(data$blood_pressure,data$recovery_time)
+## build the linear regression models
+lm1 <- lm(recovery_time ~ log_drug, data
+          = data)
+summary(lm1)
+
+lm2 <- lm(recovery_time ~ blood_pressure, data
+                     = data)
+summary(lm2)
+
+lm3 <- lm(recovery_time ~ log_drug-1, data
+          = data)
+summary(lm3)
+
+lm4 <- lm(recovery_time ~ log_drug+blood_pressure, data
+          = data)
+summary(lm4)
+
+lm5 <- lm(recovery_time ~ log_drug+blood_pressure-1, data
+          = data)
+summary(lm5)
+
+lm6 <- lm(recovery_time ~ log_drug*blood_pressure, data
+          = data)
+summary(lm6)
+## AIC test
+library(AICcmodavg)
+models <- list(lm3,lm5)
+#specify model names
+mod.names <- c('lm3','lm5')
+aictab(cand.set = models, modnames = mod.names)
+
+## a 95% prediction interval for the recovery time when the log of the quantity of drug is 2.00
+## and the mean level of systolic blood pressure during hypotension is 75mm Hg
+newdata = data.frame(log_drug=2.00,blood_pressure=75)
+predict(lm5, newdata,interval = "prediction", level = 0.95) 
